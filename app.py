@@ -1,87 +1,80 @@
 # app.py
 import flet as ft
+import random
 
 def main(page: ft.Page):
-    # Настройки страницы
-    page.title = "✨ Мое первое Flet-приложение"
+    page.title = "✨ Красивое приложение"
+    page.padding = 50
     page.theme_mode = ft.ThemeMode.LIGHT
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    page.scroll = ft.ScrollMode.AUTO
-    
-    # Элементы интерфейса
-    txt_name = ft.TextField(
-        label="Ваше имя", 
+
+    colors = ["#3b82f6", "#10b981", "#ef4444", "#8b5cf6", "#f59e0b"]
+
+    name_input = ft.TextField(
+        label="Ваше имя",
         width=300,
-        hint_text="Введите ваше имя здесь..."
-    )
-    
-    txt_result = ft.Text(size=24, weight=ft.FontWeight.BOLD)
-    
-    # Функции
-    def say_hello(e):
-        if txt_name.value.strip():
-            txt_result.value = f"Привет, {txt_name.value}! 👋"
-            txt_result.color = "green"
-        else:
-            txt_result.value = "Пожалуйста, введите имя! 📝"
-            txt_result.color = "red"
-        page.update()
-    
-    def clear_all(e):
-        txt_name.value = ""
-        txt_result.value = ""
-        page.update()
-    
-    # Сборка интерфейса
-    page.add(
-        ft.Column([
-            ft.Text("✨", size=100, text_align=ft.TextAlign.CENTER),
-            
-            ft.Text("Добро пожаловать в Flet!", 
-                   size=32, 
-                   weight=ft.FontWeight.BOLD,
-                   text_align=ft.TextAlign.CENTER),
-            
-            ft.Text("Это простое приложение на Python!",
-                   size=16,
-                   color="gray",
-                   text_align=ft.TextAlign.CENTER),
-            
-            ft.Container(height=20),
-            
-            txt_name,
-            
-            ft.Row([
-                ft.FilledButton("👋 Поздороваться", on_click=say_hello),
-                ft.OutlinedButton("🗑️ Очистить", on_click=clear_all),
-            ], alignment=ft.MainAxisAlignment.CENTER),
-            
-            ft.Container(height=20),
-            
-            ft.Container(
-                content=txt_result,
-                padding=20,
-                border_radius=10,
-                bgcolor="#f5f5f5",
-                width=400,
-                alignment=ft.alignment.Alignment(0, 0)
-            ),
-            
-            ft.Divider(height=30),
-            
-            ft.Text("💡 Попробуй ввести свое имя и нажать кнопку!",
-                   size=14,
-                   italic=True,
-                   color="blue")
-        ], 
-        spacing=10,
-        horizontal_alignment=ft.CrossAxisAlignment.CENTER)
+        border_radius=10,
+        border_color="#3b82f6"
     )
 
-# Запуск приложения - ПРАВИЛЬНЫЙ СПОСОБ
+    result = ft.Text(size=28, weight=ft.FontWeight.BOLD, text_align=ft.TextAlign.CENTER)
+
+    def greet(e):
+        if name_input.value.strip():
+            greetings = [
+                f"Привет, {name_input.value}! 👋",
+                f"Здравствуй, {name_input.value}! 😊",
+                f"Рад видеть тебя, {name_input.value}! 🎉"
+            ]
+            result.value = random.choice(greetings)
+            result.color = random.choice(colors)
+        else:
+            result.value = "Введите имя! ✏️"
+            result.color = "#ef4444"
+        page.update()
+
+    def clear(e):
+        name_input.value = ""
+        result.value = ""
+        page.update()
+
+    page.add(
+        ft.Column([
+            ft.Container(
+                content=ft.Text("🚀", size=100),
+                margin=ft.Margin(0, 0, 0, 20)
+            ),
+            ft.Text("Приложение в браузере",
+                   size=36,
+                   weight=ft.FontWeight.BOLD,
+                   color="#3b82f6"),
+            ft.Text("Запущено в веб-режиме",
+                   size=16,
+                   color="#6b7280",
+                   italic=True),
+            ft.Container(height=30),
+            name_input,
+            ft.Container(height=20),
+            ft.Row([
+                ft.FilledButton("👋 Поздороваться", on_click=greet),
+                ft.OutlinedButton("🗑️ Очистить", on_click=clear),
+            ], alignment=ft.MainAxisAlignment.CENTER),
+            ft.Container(height=30),
+            ft.Container(
+                content=result,
+                padding=25,
+                border_radius=15,
+                bgcolor="#f8fafc",
+                border=ft.border.all(2, "#e5e7eb"),
+                width=400,
+            ),
+            ft.Container(height=40),
+            ft.Text("✅ Приложение работает в браузере",
+                   size=14,
+                   color="#10b981",
+                   weight=ft.FontWeight.BOLD)
+        ], spacing=10, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
+    )
+
 if __name__ == "__main__":
-    # Вариант 1: Самый простой
-    ft.app(main)
-    
-    # Вариант 2: С указанием порта
-    # ft.app(main, port=8000)
+    ft.app(target=main, port=8086, view=ft.AppView.WEB_BROWSER)
