@@ -1,0 +1,54 @@
+2025-12-31 14:38:01,963 - __main__ - INFO - Логирование инициализировано. Файл логов: logs/snmp_checker_20251231_143801.log
+2025-12-31 14:38:01,964 - __main__ - INFO - ============================================================
+2025-12-31 14:38:01,964 - __main__ - INFO - SNMP Checker запускается...
+2025-12-31 14:38:01,964 - __main__ - INFO - Порт: 8080
+2025-12-31 14:38:01,964 - __main__ - INFO - V3 Default Username: Mr_PRTG2
+2025-12-31 14:38:01,964 - __main__ - INFO - ============================================================
+2025-12-31 14:38:02,202 - flet - INFO - Assets path configured: C:\Repo\Flet\snmp\assets
+2025-12-31 14:38:02,417 - flet - INFO - Starting Flet web server on port 8080...
+2025-12-31 14:38:02,418 - flet_web.fastapi - INFO - Web renderer configured: WebRenderer.AUTO
+2025-12-31 14:38:02,419 - flet_web.fastapi - INFO - Route URL strategy configured: RouteUrlStrategy.PATH
+2025-12-31 14:38:02,419 - flet_web.fastapi - INFO - No CDN configured: False
+2025-12-31 14:38:02,420 - flet - INFO - Flet app has started...
+2025-12-31 14:38:02,437 - flet_web.fastapi - INFO - Starting up Flet App Manager
+2025-12-31 14:38:02,438 - flet - INFO - App URL: http://127.0.0.1:8080
+2025-12-31 14:38:02,578 - flet_web.fastapi - INFO - New FletApp: PwGL2V2I
+2025-12-31 14:38:02,595 - flet_web.fastapi - INFO - New session created (1 total): _kBAGcULBGT1l68ZK_60dce29cde85fd80e62d35e4be7e993918eb9c07
+2025-12-31 14:38:02,597 - flet_web.fastapi - INFO - Start session: kBAGcULBGT1l68ZK
+2025-12-31 14:38:02,597 - app - INFO - Страница инициализирована: None
+2025-12-31 14:38:02,597 - app - INFO - URL страницы: ws://127.0.0.1:8080
+2025-12-31 14:38:02,598 - components - INFO - Создание контейнера параметров SNMP v3
+2025-12-31 14:38:02,599 - components - INFO - Создание контейнера OID карточек (13 карточек)
+2025-12-31 14:38:02,622 - app - INFO - UI построен
+2025-12-31 14:38:02,623 - app - INFO - Приложение SNMPChecker инициализировано
+2025-12-31 14:38:02,623 - app - INFO - Текущий режим: v2c
+2025-12-31 14:38:02,646 - flet_web.fastapi - INFO - New FletApp: yxghJHtE
+2025-12-31 14:38:02,726 - flet_web.fastapi - INFO - New session created (2 total): _An54P9LPgmuBqzfa_60dce29cde85fd80e62d35e4be7e993918eb9c07
+2025-12-31 14:38:02,727 - flet_web.fastapi - INFO - Start session: An54P9LPgmuBqzfa
+2025-12-31 14:38:02,728 - app - INFO - Страница инициализирована: None
+2025-12-31 14:38:02,728 - app - INFO - URL страницы: ws://127.0.0.1:8080
+2025-12-31 14:38:02,728 - components - INFO - Создание контейнера параметров SNMP v3
+2025-12-31 14:38:02,729 - components - INFO - Создание контейнера OID карточек (13 карточек)
+2025-12-31 14:38:02,749 - app - INFO - UI построен
+2025-12-31 14:38:02,749 - app - INFO - Приложение SNMPChecker инициализировано
+2025-12-31 14:38:02,750 - app - INFO - Текущий режим: v2c
+2025-12-31 14:38:02,774 - flet_web.fastapi - INFO - Temp dir created for patched index and manifest: C:\Users\Trofimov\AppData\Local\Temp\tmp01z5fivh
+2025-12-31 14:38:02,774 - flet_web.fastapi - INFO - Web root: C:\Users\Trofimov\AppData\Local\Programs\Python\Python314\Lib\site-packages\flet_web\web
+2025-12-31 14:38:02,775 - flet_web.fastapi - INFO - assets_dir does not exist: C:\Repo\Flet\snmp\assets
+2025-12-31 14:38:02,775 - flet_web.fastapi - INFO - Assets dir: None
+2025-12-31 14:38:03,011 - flet_web.fastapi - INFO - New FletApp: wkvnESkr
+2025-12-31 14:38:03,021 - flet_web.fastapi - INFO - New session created (3 total): _aNUZXdj86igW3I0B_60dce29cde85fd80e62d35e4be7e993918eb9c07
+2025-12-31 14:38:03,023 - flet_web.fastapi - INFO - Start session: aNUZXdj86igW3I0B
+2025-12-31 14:38:03,023 - app - INFO - Страница инициализирована: None
+2025-12-31 14:38:03,023 - app - INFO - URL страницы: ws://127.0.0.1:8080
+2025-12-31 14:38:03,025 - components - INFO - Создание контейнера параметров SNMP v3
+2025-12-31 14:38:03,026 - components - INFO - Создание контейнера OID карточек (13 карточек)
+2025-12-31 14:38:03,049 - app - INFO - UI построен
+2025-12-31 14:38:03,050 - app - INFO - Приложение SNMPChecker инициализировано
+2025-12-31 14:38:03,050 - app - INFO - Текущий режим: v2c
+2025-12-31 14:40:15,926 - flet_web.fastapi - INFO - Session disconnected: _aNUZXdj86igW3I0B_60dce29cde85fd80e62d35e4be7e993918eb9c07
+2025-12-31 14:40:15,927 - flet_web.fastapi - INFO - Disposing FletApp: wkvnESkr
+2025-12-31 14:40:16,042 - flet_web.fastapi - INFO - Shutting down Flet App Manager
+2025-12-31 14:40:16,042 - flet_web.fastapi - INFO - Deleting temp dir: C:\Users\Trofimov\AppData\Local\Temp\tmp01z5fivh
+2025-12-31 14:40:16,043 - flet_web.fastapi - INFO - Closing Flet web server...
+2025-12-31 14:40:16,165 - __main__ - INFO - Приложение успешно завершено
