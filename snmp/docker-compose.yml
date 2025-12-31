@@ -1,0 +1,21 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  snmp-checker:
+    build: .
+    container_name: snmp-checker
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./logs:/app/logs
+      - ./snmp_data:/app/data
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Moscow
+    networks:
+      - snmp-network
+
+networks:
+  snmp-network:
+    driver: bridge

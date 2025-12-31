@@ -1,0 +1,28 @@
+2025-12-31 14:45:20,096 - __main__ - INFO - Логирование инициализировано. Файл логов: logs/snmp_checker_20251231_144520.log
+2025-12-31 14:45:20,098 - __main__ - INFO - ============================================================
+2025-12-31 14:45:20,098 - __main__ - INFO - SNMP Checker запускается...
+2025-12-31 14:45:20,098 - __main__ - INFO - Порт: 8888
+2025-12-31 14:45:20,098 - __main__ - INFO - V3 Default Username: Mr_PRTG2
+2025-12-31 14:45:20,098 - __main__ - INFO - ============================================================
+2025-12-31 14:45:20,237 - flet - INFO - Assets path configured: C:\Repo\Flet\snmp\assets
+2025-12-31 14:45:20,486 - flet - INFO - Starting Flet web server on port 8888...
+2025-12-31 14:45:20,487 - flet_web.fastapi - INFO - Web renderer configured: WebRenderer.AUTO
+2025-12-31 14:45:20,488 - flet_web.fastapi - INFO - Route URL strategy configured: RouteUrlStrategy.PATH
+2025-12-31 14:45:20,488 - flet_web.fastapi - INFO - No CDN configured: False
+2025-12-31 14:45:20,489 - flet - INFO - Flet app has started...
+2025-12-31 14:45:20,509 - flet_web.fastapi - INFO - Starting up Flet App Manager
+2025-12-31 14:45:20,510 - flet - INFO - App URL: http://127.0.0.1:8888
+2025-12-31 14:45:20,752 - flet_web.fastapi - INFO - Temp dir created for patched index and manifest: C:\Users\Trofimov\AppData\Local\Temp\tmpwufi3mg1
+2025-12-31 14:45:20,753 - flet_web.fastapi - INFO - Web root: C:\Users\Trofimov\AppData\Local\Programs\Python\Python314\Lib\site-packages\flet_web\web
+2025-12-31 14:45:20,753 - flet_web.fastapi - INFO - assets_dir does not exist: C:\Repo\Flet\snmp\assets
+2025-12-31 14:45:20,753 - flet_web.fastapi - INFO - Assets dir: None
+2025-12-31 14:45:21,073 - flet_web.fastapi - INFO - New FletApp: 5tNEBVOQ
+2025-12-31 14:45:21,090 - flet_web.fastapi - INFO - New session created (1 total): _sMxawvtkhP3A9GAz_60dce29cde85fd80e62d35e4be7e993918eb9c07
+2025-12-31 14:45:21,093 - flet_web.fastapi - INFO - Start session: sMxawvtkhP3A9GAz
+2025-12-31 14:45:21,094 - app - INFO - Страница инициализирована: None
+2025-12-31 14:45:21,094 - app - INFO - URL страницы: ws://127.0.0.1:8888
+2025-12-31 14:45:21,095 - components - INFO - Создание контейнера параметров SNMP v3
+2025-12-31 14:45:21,095 - components - INFO - Создание контейнера OID карточек (3 карточек)
+2025-12-31 14:45:21,109 - app - INFO - UI построен
+2025-12-31 14:45:21,110 - app - INFO - Приложение SNMPChecker инициализировано
+2025-12-31 14:45:21,110 - app - INFO - Текущий режим: v2c
