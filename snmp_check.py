@@ -9,6 +9,13 @@ import asyncio
 from pysnmp.hlapi.v3arch.asyncio import *
 from pysnmp import hlapi
 
+# Настройки по умолчанию для v3 (вынесены в глобальную область)
+V3_DEFAULT_USERNAME = "Mr_PRTG2"
+V3_DEFAULT_AUTH_KEY = "Flutter$hybestPony"
+V3_DEFAULT_PRIV_KEY = "Flutter$hybestPony"
+V3_DEFAULT_AUTH_PROTOCOL = "SHA"
+V3_DEFAULT_PRIV_PROTOCOL = "AES"
+
 # Асинхронная функция для проверки SNMP v2c
 async def check_snmp_v2c_async(ip, oid, community="public", port=161):
     """Асинхронная проверка SNMP OID для версии v2c"""
@@ -122,7 +129,8 @@ def main(page: ft.Page):
         "dark": "#1f2937",
         "light": "#f8fafc",
         "v2c": "#10b981",
-        "v3": "#8b5cf6"
+        "v3": "#8b5cf6",
+        "v3_default": "#ec4899"  # Розовый цвет для кнопки быстрой настройки
     }
 
     # Переменные для хранения выбранной версии
@@ -252,7 +260,7 @@ def main(page: ft.Page):
     # Кнопки выбора версии SNMP
     v2c_button = ft.ElevatedButton(
         "SNMP v2c",
-        width=150,
+        width=120,
         height=40,
         bgcolor=colors["v2c"],
         color=ft.Colors.WHITE,
@@ -263,13 +271,26 @@ def main(page: ft.Page):
 
     v3_button = ft.ElevatedButton(
         "SNMP v3",
-        width=150,
+        width=120,
         height=40,
         bgcolor=ft.Colors.GREY_300,
         color=colors["dark"],
         style=ft.ButtonStyle(
             shape=ft.RoundedRectangleBorder(radius=10)
         )
+    )
+
+    # НОВАЯ КНОПКА: Быстрая настройка v3 по умолчанию
+    v3_default_button = ft.ElevatedButton(
+        "V3 Default",
+        width=120,
+        height=40,
+        bgcolor=ft.Colors.GREY_300,
+        color=colors["dark"],
+        style=ft.ButtonStyle(
+            shape=ft.RoundedRectangleBorder(radius=10)
+        ),
+        tooltip=f"Быстрая настройка SNMP v3\nUsername: {V3_DEFAULT_USERNAME}\nAuth/Priv Key: {V3_DEFAULT_AUTH_KEY}\nAuth: {V3_DEFAULT_AUTH_PROTOCOL}, Priv: {V3_DEFAULT_PRIV_PROTOCOL}"
     )
 
     # Кнопки действий
@@ -342,6 +363,8 @@ def main(page: ft.Page):
         v2c_button.color = ft.Colors.WHITE
         v3_button.bgcolor = ft.Colors.GREY_300
         v3_button.color = colors["dark"]
+        v3_default_button.bgcolor = ft.Colors.GREY_300
+        v3_default_button.color = colors["dark"]
         
         # Показываем v2c параметры, скрываем v3
         community_input.visible = True
@@ -355,6 +378,8 @@ def main(page: ft.Page):
         v3_button.color = ft.Colors.WHITE
         v2c_button.bgcolor = ft.Colors.GREY_300
         v2c_button.color = colors["dark"]
+        v3_default_button.bgcolor = ft.Colors.GREY_300
+        v3_default_button.color = colors["dark"]
         
         # Показываем v3 параметры, скрываем v2c
         community_input.visible = False
@@ -371,6 +396,54 @@ def main(page: ft.Page):
         auth_key_input.visible = True
         enable_encryption_checkbox.visible = True
         
+        # Сбрасываем значения на стандартные
+        v3_username_input.value = ""
+        auth_protocol_dropdown.value = V3_DEFAULT_AUTH_PROTOCOL
+        auth_key_input.value = ""
+        priv_protocol_dropdown.value = V3_DEFAULT_PRIV_PROTOCOL
+        priv_key_input.value = ""
+        
+        page.update()
+
+    # НОВАЯ ФУНКЦИЯ: Быстрая настройка v3 по умолчанию
+    def switch_to_v3_default(e):
+        current_snmp_version.value = "v3_default"
+        v3_default_button.bgcolor = colors["v3_default"]
+        v3_default_button.color = ft.Colors.WHITE
+        v2c_button.bgcolor = ft.Colors.GREY_300
+        v2c_button.color = colors["dark"]
+        v3_button.bgcolor = ft.Colors.GREY_300
+        v3_button.color = colors["dark"]
+        
+        # Показываем v3 параметры, скрываем v2c
+        community_input.visible = False
+        v3_params_container.visible = True
+        
+        # Автоматически включаем шифрование и заполняем поля
+        enable_encryption_checkbox.value = True
+        priv_protocol_dropdown.visible = True
+        priv_key_input.visible = True
+        
+        # Заполняем поля значениями по умолчанию
+        v3_username_input.value = V3_DEFAULT_USERNAME
+        auth_protocol_dropdown.value = V3_DEFAULT_AUTH_PROTOCOL
+        auth_key_input.value = V3_DEFAULT_AUTH_KEY
+        priv_protocol_dropdown.value = V3_DEFAULT_PRIV_PROTOCOL
+        priv_key_input.value = V3_DEFAULT_PRIV_KEY
+        
+        # Показываем все поля v3
+        v3_username_input.visible = True
+        auth_protocol_dropdown.visible = True
+        auth_key_input.visible = True
+        enable_encryption_checkbox.visible = True
+        
+        page.update()
+        
+        # Показываем уведомление
+        page.snack_bar = ft.SnackBar(
+            ft.Text(f"Загружены настройки по умолчанию: {V3_DEFAULT_USERNAME}")
+        )
+        page.snack_bar.open = True
         page.update()
 
     async def check_snmp_click(e):
@@ -396,8 +469,23 @@ def main(page: ft.Page):
                 )
                 version_text = "SNMP v2c"
                 version_color = colors["v2c"]
+                version_badge_text = "v2c"
+            elif current_snmp_version.value == "v3_default":
+                # Проверка SNMP v3 с настройками по умолчанию
+                result = await check_snmp_v3_async(
+                    ip_input.value,
+                    oid_input.value,
+                    V3_DEFAULT_USERNAME,
+                    V3_DEFAULT_AUTH_KEY,
+                    V3_DEFAULT_PRIV_KEY,
+                    V3_DEFAULT_AUTH_PROTOCOL,
+                    V3_DEFAULT_PRIV_PROTOCOL
+                )
+                version_text = "SNMP v3 (Default)"
+                version_color = colors["v3_default"]
+                version_badge_text = "v3 ⚡"
             else:
-                # Проверка SNMP v3
+                # Проверка SNMP v3 с ручными настройками
                 if not v3_username_input.value.strip():
                     page.snack_bar = ft.SnackBar(ft.Text("Введите Username для SNMP v3!"))
                     page.snack_bar.open = True
@@ -429,6 +517,7 @@ def main(page: ft.Page):
                 )
                 version_text = "SNMP v3"
                 version_color = colors["v3"]
+                version_badge_text = "v3"
 
             if result["success"]:
                 result_card = ft.Card(
@@ -437,7 +526,7 @@ def main(page: ft.Page):
                             ft.Row([
                                 ft.Text("✅ УСПЕШНО", size=16, weight=ft.FontWeight.BOLD, color=colors["success"]),
                                 ft.Container(expand=True),
-                                ft.Badge(version_text, bgcolor=version_color, color=ft.Colors.WHITE),
+                                ft.Badge(version_badge_text, bgcolor=version_color, color=ft.Colors.WHITE),
                                 ft.Text(f" | IP: {ip_input.value}", size=10, color=ft.Colors.GREY_600)
                             ]),
                             ft.Text(f"OID: {oid_input.value}", size=12, color=ft.Colors.GREY_700),
@@ -471,7 +560,7 @@ def main(page: ft.Page):
                             ft.Row([
                                 ft.Text("❌ ОШИБКА", size=16, weight=ft.FontWeight.BOLD, color=colors["error"]),
                                 ft.Container(expand=True),
-                                ft.Badge(version_text, bgcolor=version_color, color=ft.Colors.WHITE),
+                                ft.Badge(version_badge_text, bgcolor=version_color, color=ft.Colors.WHITE),
                                 ft.Text(f" | IP: {ip_input.value}", size=10, color=ft.Colors.GREY_600)
                             ]),
                             ft.Text(f"OID: {oid_input.value}", size=12, color=ft.Colors.GREY_700),
@@ -520,6 +609,8 @@ def main(page: ft.Page):
         # Восстанавливаем видимость полей в зависимости от текущей версии
         if current_snmp_version.value == "v2c":
             switch_to_v2c(None)
+        elif current_snmp_version.value == "v3_default":
+            switch_to_v3_default(None)
         else:
             switch_to_v3(None)
         
@@ -540,6 +631,7 @@ def main(page: ft.Page):
     # Привязываем обработчики
     v2c_button.on_click = switch_to_v2c
     v3_button.on_click = switch_to_v3
+    v3_default_button.on_click = switch_to_v3_default
     check_button.on_click = lambda e: asyncio.create_task(check_snmp_click(e))
     clear_button.on_click = clear_results
 
@@ -562,11 +654,28 @@ def main(page: ft.Page):
                         
                         ft.Row([
                             v2c_button,
-                            ft.Container(width=20),
-                            v3_button
+                            ft.Container(width=10),
+                            v3_button,
+                            ft.Container(width=10),
+                            v3_default_button
                         ], alignment=ft.MainAxisAlignment.CENTER),
                         
-                        ft.Container(height=20),
+                        ft.Container(height=10),
+                        
+                        # Подсказка под кнопками
+                        ft.Container(
+                            content=ft.Column([
+                                ft.Text("Выберите режим работы:", size=12, color=ft.Colors.GREY_600),
+                                ft.Row([
+                                    ft.Text("• v2c: Простая community-аутентификация", size=10, color=colors["v2c"]),
+                                    ft.Text("• v3: Настраиваемые параметры", size=10, color=colors["v3"]),
+                                    ft.Text("• V3 Default: Быстрая настройка", size=10, color=colors["v3_default"]),
+                                ], wrap=True, spacing=10)
+                            ], spacing=5),
+                            padding=ft.padding.symmetric(vertical=5)
+                        ),
+                        
+                        ft.Container(height=10),
                         
                         ip_input,
                         oid_input,
@@ -633,6 +742,7 @@ def main(page: ft.Page):
                         ft.Text("Информация:", size=12, color=ft.Colors.GREY_600),
                         ft.Text("• SNMP v2c: community-based аутентификация", size=12, color=colors["v2c"]),
                         ft.Text("• SNMP v3: user-based аутентификация с поддержкой шифрования", size=12, color=colors["v3"]),
+                        ft.Text(f"• V3 Default: {V3_DEFAULT_USERNAME} (SHA+AES)", size=12, color=colors["v3_default"]),
                         ft.Text("• Протоколы: SHA/MD5 для аутентификации, AES/DES для шифрования", size=12, color=colors["dark"]),
                     ], wrap=True, spacing=10)
                 ], spacing=10),
@@ -646,6 +756,11 @@ if __name__ == "__main__":
     print("=" * 60)
     print("🚀 SNMP Checker запускается...")
     print("📡 Поддерживается SNMP v2c и SNMP v3")
+    print("⚡ НОВОЕ: Кнопка быстрой настройки V3 Default")
+    print(f"   Username: {V3_DEFAULT_USERNAME}")
+    print(f"   Auth/Priv Key: {V3_DEFAULT_AUTH_KEY}")
+    print(f"   Auth Protocol: {V3_DEFAULT_AUTH_PROTOCOL}")
+    print(f"   Priv Protocol: {V3_DEFAULT_PRIV_PROTOCOL}")
     print("🔐 SNMP v3 поддерживает:")
     print("   - Аутентификация: SHA, MD5")
     print("   - Шифрование: AES-128, AES-256, DES")
