@@ -764,7 +764,7 @@ if __name__ == "__main__":
     print("🔐 SNMP v3 поддерживает:")
     print("   - Аутентификация: SHA, MD5")
     print("   - Шифрование: AES-128, AES-256, DES")
-    print("🌐 Откройте браузер по адресу: http://localhost:8080")
+    print("🌐 Откройте браузер по адресу: http://127.0.0.1:8080")
     print("=" * 60)
     
     import warnings
