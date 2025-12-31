@@ -4,10 +4,14 @@
 
 import flet as ft
 import asyncio
+import logging
+from datetime import datetime
 from config import *
 from snmp_utils import check_snmp_v2c_async, check_snmp_v3_async
 from components import *
 
+# Логгер для этого модуля
+logger = logging.getLogger(__name__)
 
 class SNMPCheckerApp:
     def __init__(self, page: ft.Page):
@@ -16,6 +20,9 @@ class SNMPCheckerApp:
         self.create_ui_elements()
         self.setup_event_handlers()
         self.build_ui()
+        
+        logger.info("Приложение SNMPChecker инициализировано")
+        logger.info(f"Текущий режим: {self.current_snmp_version}")
     
     def setup_page(self):
         self.page.title = APP_TITLE
@@ -23,6 +30,7 @@ class SNMPCheckerApp:
         self.page.theme_mode = ft.ThemeMode.LIGHT
         self.page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
         self.page.scroll = ft.ScrollMode.AUTO
+        logger.debug("Страница настроена")
     
     def create_ui_elements(self):
         # Текущая версия SNMP
@@ -66,12 +74,20 @@ class SNMPCheckerApp:
             height=300,
             width=600
         )
-        self.result_counter = ft.Text("0")
+        # Заменяем Badge на Container для счетчика результатов
+        self.result_counter = ft.Container(
+            content=ft.Text("0", size=12, color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD),
+            padding=ft.padding.symmetric(horizontal=8, vertical=3),
+            bgcolor=COLORS["primary"],
+            border_radius=15
+        )
         self.loading_indicator = ft.ProgressRing(visible=False, width=40, height=40, stroke_width=3)
         
         # Контейнеры
         self.v3_params_container = self.create_v3_params_container()
         self.oid_cards_container = create_oid_cards_container(self.use_common_oid)
+        
+        logger.debug("UI элементы созданы")
     
     def create_v3_params_container(self):
         return ft.Column(
@@ -96,6 +112,7 @@ class SNMPCheckerApp:
         self.check_button.on_click = lambda e: asyncio.create_task(self.check_snmp_click(e))
         self.clear_button.on_click = self.clear_results
         self.enable_encryption_checkbox.on_change = self.toggle_encryption_fields
+        logger.debug("Обработчики событий настроены")
     
     def build_ui(self):
         self.page.add(
@@ -109,6 +126,7 @@ class SNMPCheckerApp:
                 self.create_footer()
             ], spacing=20, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
         )
+        logger.info("UI построен")
     
     def create_header(self):
         return ft.Container(
@@ -189,7 +207,7 @@ class SNMPCheckerApp:
                 ft.Row([
                     ft.Text("Результаты проверки", size=20, weight=ft.FontWeight.BOLD),
                     ft.Container(expand=True),
-                    ft.Badge("0", ref=self.result_counter)
+                    self.result_counter  # Используем Container вместо Badge
                 ]),
                 ft.Divider(height=1),
                 ft.Container(
@@ -225,6 +243,7 @@ class SNMPCheckerApp:
         self.community_input.visible = True
         self.v3_params_container.visible = False
         self.page.update()
+        logger.info("Переключен режим на SNMP v2c")
     
     def switch_to_v3(self, e):
         self.current_snmp_version = "v3"
@@ -233,6 +252,7 @@ class SNMPCheckerApp:
         self.v3_params_container.visible = True
         self.reset_v3_fields()
         self.page.update()
+        logger.info("Переключен режим на SNMP v3 (ручные настройки)")
     
     def switch_to_v3_default(self, e):
         self.current_snmp_version = "v3_default"
@@ -249,6 +269,7 @@ class SNMPCheckerApp:
         self.priv_protocol_dropdown.value = V3_DEFAULT_PRIV_PROTOCOL
         self.priv_key_input.value = V3_DEFAULT_PRIV_KEY
         
+        logger.info(f"Переключен режим на SNMP v3 Default: {V3_DEFAULT_USERNAME}")
         self.show_snackbar(f"Загружены настройки по умолчанию: {V3_DEFAULT_USERNAME}")
         self.page.update()
     
@@ -286,16 +307,22 @@ class SNMPCheckerApp:
     def toggle_encryption_fields(self, e):
         self.priv_protocol_dropdown.visible = self.enable_encryption_checkbox.value
         self.priv_key_input.visible = self.enable_encryption_checkbox.value
+        logger.debug(f"Шифрование {'включено' if self.enable_encryption_checkbox.value else 'выключено'}")
         self.page.update()
     
     def use_common_oid(self, oid):
         self.oid_input.value = oid
+        logger.info(f"Использован общий OID: {oid}")
         self.page.update()
     
     async def check_snmp_click(self, e):
         if not self.ip_input.value.strip() or not self.oid_input.value.strip():
+            error_msg = "Не заполнены IP адрес и/или OID"
+            logger.warning(error_msg)
             self.show_snackbar("Введите IP адрес и OID!")
             return
+        
+        logger.info(f"Начало проверки SNMP: IP={self.ip_input.value}, OID={self.oid_input.value}")
         
         self.loading_indicator.visible = True
         self.check_button.disabled = True
@@ -303,8 +330,11 @@ class SNMPCheckerApp:
         
         try:
             result = await self.perform_snmp_check()
+            logger.info(f"Результат проверки: {'Успех' if result['success'] else 'Ошибка'}")
             self.add_result_card(result)
         except Exception as ex:
+            error_msg = f"Исключение при проверке SNMP: {str(ex)}"
+            logger.error(error_msg, exc_info=True)
             self.show_snackbar(f"Ошибка: {str(ex)}")
         finally:
             self.loading_indicator.visible = False
@@ -316,10 +346,12 @@ class SNMPCheckerApp:
         oid = self.oid_input.value
         
         if self.current_snmp_version == "v2c":
+            logger.info(f"Выполнение SNMP v2c запроса к {ip}")
             return await check_snmp_v2c_async(
                 ip, oid, self.community_input.value or "public"
             )
         elif self.current_snmp_version == "v3_default":
+            logger.info(f"Выполнение SNMP v3 Default запроса к {ip}")
             return await check_snmp_v3_async(
                 ip, oid,
                 V3_DEFAULT_USERNAME,
@@ -330,6 +362,7 @@ class SNMPCheckerApp:
             )
         else:
             if not self.v3_username_input.value.strip():
+                logger.error("SNMP v3: не указан Username")
                 raise ValueError("Введите Username для SNMP v3!")
             
             auth_key = self.auth_key_input.value if self.auth_key_input.value.strip() else None
@@ -340,6 +373,7 @@ class SNMPCheckerApp:
                 priv_key = self.priv_key_input.value if self.priv_key_input.value.strip() else None
                 priv_protocol = self.priv_protocol_dropdown.value
             
+            logger.info(f"Выполнение SNMP v3 запроса к {ip} (User: {self.v3_username_input.value})")
             return await check_snmp_v3_async(
                 ip, oid,
                 self.v3_username_input.value,
@@ -361,7 +395,16 @@ class SNMPCheckerApp:
         )
         
         self.result_output.controls.insert(0, card)
-        self.result_counter.value = str(len(self.result_output.controls))
+        
+        # Обновляем счетчик результатов
+        count = len(self.result_output.controls)
+        self.result_counter.content.value = str(count)
+        
+        # Логируем результат
+        if result["success"]:
+            logger.info(f"Добавлена карточка успешного результата: {self.ip_input.value}")
+        else:
+            logger.warning(f"Добавлена карточка ошибки: {self.ip_input.value}")
     
     def get_version_info(self):
         if self.current_snmp_version == "v2c":
@@ -372,11 +415,15 @@ class SNMPCheckerApp:
             return {"badge": "v3", "color": COLORS["v3"]}
     
     def clear_results(self, e):
+        logger.info("Очистка результатов и полей ввода")
+        
         self.result_output.controls.clear()
         self.ip_input.value = ""
         self.oid_input.value = ""
         self.community_input.value = "public"
-        self.result_counter.value = "0"
+        
+        # Сбрасываем счетчик
+        self.result_counter.content.value = "0"
         
         if self.current_snmp_version == "v2c":
             self.switch_to_v2c(None)
@@ -388,10 +435,13 @@ class SNMPCheckerApp:
         self.page.update()
     
     def show_snackbar(self, message):
+        logger.debug(f"Показан snackbar: {message}")
         self.page.snack_bar = ft.SnackBar(ft.Text(message))
         self.page.snack_bar.open = True
         self.page.update()
 
 
 def main(page: ft.Page):
+    logger.info(f"Страница инициализирована: {page.title}")
+    logger.info(f"URL страницы: {page.url}")
     app = SNMPCheckerApp(page)

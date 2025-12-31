@@ -1,0 +1,3 @@
+flet>=0.23.0
+pysnmp==5.0.25
+pysnmp-mibs==0.4.0

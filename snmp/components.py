@@ -3,11 +3,15 @@ UI компоненты для приложения
 """
 
 import flet as ft
+import logging
 from config import COLORS, COMMON_OIDS
 
+# Логгер для этого модуля
+logger = logging.getLogger(__name__)
 
 def create_input_field(label, hint, width=500, password=False, visible=True):
     """Создает стандартное поле ввода"""
+    logger.debug(f"Создание поля ввода: {label}")
     return ft.TextField(
         label=label,
         hint_text=hint,
@@ -19,9 +23,9 @@ def create_input_field(label, hint, width=500, password=False, visible=True):
         visible=visible
     )
 
-
 def create_version_button(text, color, is_active=False):
     """Создает кнопку выбора версии SNMP"""
+    logger.debug(f"Создание кнопки версии: {text}, активна: {is_active}")
     bgcolor = color if is_active else ft.Colors.GREY_300
     text_color = ft.Colors.WHITE if is_active else COLORS["dark"]
     
@@ -36,9 +40,9 @@ def create_version_button(text, color, is_active=False):
         )
     )
 
-
 def create_action_button(text, icon=None, color=None, width=200, height=50):
     """Создает кнопку действия"""
+    logger.debug(f"Создание кнопки действия: {text}")
     button_text = text
     if icon:
         button_text = f"{icon} {text}"
@@ -52,9 +56,9 @@ def create_action_button(text, icon=None, color=None, width=200, height=50):
         )
     )
 
-
 def create_oid_card(oid, description, on_use_click):
     """Создает карточку OID"""
+    logger.debug(f"Создание карточки OID: {description} ({oid})")
     return ft.Card(
         content=ft.Container(
             content=ft.Column([
@@ -72,9 +76,9 @@ def create_oid_card(oid, description, on_use_click):
         bgcolor=COLORS["light"]
     )
 
-
 def create_oid_cards_container(on_use_callback):
     """Создает контейнер с карточками OID"""
+    logger.info(f"Создание контейнера OID карточек ({len(COMMON_OIDS)} карточек)")
     oid_cards = ft.Row(wrap=True, spacing=10, run_spacing=10, width=800)
     
     for oid, description in COMMON_OIDS:
@@ -82,11 +86,30 @@ def create_oid_cards_container(on_use_callback):
             create_oid_card(oid, description, on_use_callback)
         )
     
+    logger.debug("Контейнер OID карточек создан")
     return oid_cards
 
+def create_version_badge(version_text, version_color):
+    """Создает бейдж версии (альтернатива Badge)"""
+    return ft.Container(
+        content=ft.Text(
+            version_text,
+            size=10,
+            color=ft.Colors.WHITE,
+            weight=ft.FontWeight.BOLD
+        ),
+        padding=ft.padding.symmetric(horizontal=8, vertical=2),
+        bgcolor=version_color,
+        border_radius=15,
+        margin=ft.margin.symmetric(horizontal=5)
+    )
 
 def create_result_card(result, version_text, version_color, ip, oid):
     """Создает карточку результата"""
+    logger.debug(f"Создание карточки результата: {ip} -> {oid[:30]}...")
+    
+    version_badge = create_version_badge(version_text, version_color)
+    
     if result["success"]:
         return ft.Card(
             content=ft.Container(
@@ -94,20 +117,33 @@ def create_result_card(result, version_text, version_color, ip, oid):
                     ft.Row([
                         ft.Text("✅ УСПЕШНО", size=16, weight=ft.FontWeight.BOLD, color=COLORS["success"]),
                         ft.Container(expand=True),
-                        ft.Badge(version_text, bgcolor=version_color, color=ft.Colors.WHITE),
-                        ft.Text(f" | IP: {ip}", size=10, color=ft.Colors.GREY_600)
+                        version_badge,
+                        ft.Text(f"IP: {ip}", size=10, color=ft.Colors.GREY_600)
                     ]),
-                    ft.Text(f"OID: {oid}", size=12, color=ft.Colors.GREY_700),
+                    ft.Text(f"OID: {oid}", size=12, color=ft.Colors.GREY_700, selectable=True),
                     ft.Divider(height=1),
                     ft.Container(
-                        content=ft.Text(result["value"], size=12, selectable=True, font_family="Monospace"),
+                        content=ft.Text(
+                            result["value"], 
+                            size=12, 
+                            selectable=True, 
+                            font_family="monospace",
+                            max_lines=5,
+                            overflow=ft.TextOverflow.ELLIPSIS
+                        ),
                         padding=10,
                         bgcolor=COLORS["light"],
                         border_radius=5
                     ),
                     ft.Row([
-                        ft.TextButton("Копировать значение"),
-                        ft.TextButton("Копировать OID")
+                        ft.TextButton(
+                            "Копировать значение",
+                            on_click=lambda e: logger.info(f"Копирование значения: {ip}")
+                        ),
+                        ft.TextButton(
+                            "Копировать OID",
+                            on_click=lambda e: logger.info(f"Копирование OID: {oid}")
+                        )
                     ])
                 ], spacing=5),
                 padding=15,
@@ -122,13 +158,19 @@ def create_result_card(result, version_text, version_color, ip, oid):
                     ft.Row([
                         ft.Text("❌ ОШИБКА", size=16, weight=ft.FontWeight.BOLD, color=COLORS["error"]),
                         ft.Container(expand=True),
-                        ft.Badge(version_text, bgcolor=version_color, color=ft.Colors.WHITE),
-                        ft.Text(f" | IP: {ip}", size=10, color=ft.Colors.GREY_600)
+                        version_badge,
+                        ft.Text(f"IP: {ip}", size=10, color=ft.Colors.GREY_600)
                     ]),
-                    ft.Text(f"OID: {oid}", size=12, color=ft.Colors.GREY_700),
+                    ft.Text(f"OID: {oid}", size=12, color=ft.Colors.GREY_700, selectable=True),
                     ft.Divider(height=1),
                     ft.Container(
-                        content=ft.Text(result["error"], size=12, selectable=True, font_family="Monospace"),
+                        content=ft.Text(
+                            result["error"], 
+                            size=12, 
+                            selectable=True, 
+                            font_family="monospace",
+                            color=COLORS["error"]
+                        ),
                         padding=10,
                         bgcolor=COLORS["light"],
                         border_radius=5
@@ -140,9 +182,10 @@ def create_result_card(result, version_text, version_color, ip, oid):
             elevation=2
         )
 
-
 def create_v3_parameters_container():
     """Создает контейнер параметров SNMP v3"""
+    logger.info("Создание контейнера параметров SNMP v3")
+    
     username_input = create_input_field("Username", "SNMP v3 username", visible=False)
     
     auth_protocol_dropdown = ft.Dropdown(
@@ -180,6 +223,7 @@ def create_v3_parameters_container():
         visible=False
     )
     
+    logger.debug("Контейнер параметров SNMP v3 создан")
     return {
         "username_input": username_input,
         "auth_protocol_dropdown": auth_protocol_dropdown,
